@@ -76,6 +76,9 @@
 #elif defined(__arm__) && defined(TEENSYDUINO)
 #include "hal/architecture/Teensy3/MyHwTeensy3.cpp"
 #include "hal/crypto/generic/MyCryptoGeneric.cpp"
+#elif defined(__ASR6501__) || defined (__ASR6502__)
+#include "hal/architecture/ASR650x/MyHwASR650x.cpp"
+#include "hal/crypto/generic/MyCryptoGeneric.cpp"
 #elif defined(__linux__)
 #include "hal/architecture/Linux/MyHwLinuxGeneric.cpp"
 #include "hal/crypto/generic/MyCryptoGeneric.cpp"
@@ -285,8 +288,12 @@ MY_DEFAULT_RX_LED_PIN in your sketch instead to enable LEDs
 #else
 #define __RS485CNT 0	//!< __RS485CNT
 #endif
-
-#if (__RF24CNT + __NRF5ESBCNT + __RFM69CNT + __RFM95CNT + __RS485CNT > 1)
+#if defined(MY_RADIO_SX126x)
+#define __SX126xCNT 1   //!< __SX126xCNT
+#else
+#define __SX126xCNT 0   //!< __SX126xCNT
+#endif
+#if (__RF24CNT + __NRF5ESBCNT + __RFM69CNT + __RFM95CNT + __RS485CNT + __SX126xCNT > 1)
 #error Only one forward link driver can be activated
 #endif
 #endif //DOXYGEN
@@ -297,7 +304,7 @@ MY_DEFAULT_RX_LED_PIN in your sketch instead to enable LEDs
 #endif
 
 // TRANSPORT INCLUDES
-#if defined(MY_RADIO_RF24) || defined(MY_RADIO_NRF5_ESB) || defined(MY_RADIO_RFM69) || defined(MY_RADIO_RFM95) || defined(MY_RS485)
+#if defined(MY_RADIO_RF24) || defined(MY_RADIO_NRF5_ESB) || defined(MY_RADIO_RFM69) || defined(MY_RADIO_RFM95) || defined(MY_RS485) || defined(MY_RADIO_SX126x)
 #include "hal/transport/MyTransportHAL.h"
 #include "core/MyTransport.h"
 
@@ -321,7 +328,7 @@ MY_DEFAULT_RX_LED_PIN in your sketch instead to enable LEDs
 #define MY_RAM_ROUTING_TABLE_ENABLED
 #elif defined(MY_RAM_ROUTING_TABLE_FEATURE) && defined(MY_REPEATER_FEATURE)
 // activate feature based on architecture
-#if defined(ARDUINO_ARCH_ESP8266) || defined(ARDUINO_ARCH_ESP32) || defined(ARDUINO_ARCH_SAMD) || defined(ARDUINO_ARCH_NRF5) || defined(ARDUINO_ARCH_STM32F1) || defined(TEENSYDUINO) || defined(__linux__)
+#if defined(ARDUINO_ARCH_ESP8266) || defined(ARDUINO_ARCH_ESP32) || defined(ARDUINO_ARCH_SAMD) || defined(ARDUINO_ARCH_NRF5) || defined(ARDUINO_ARCH_STM32F1) || defined(TEENSYDUINO) || defined(__linux__) || #elif defined(__ASR6501__) || defined (__ASR6502__)
 #define MY_RAM_ROUTING_TABLE_ENABLED
 #elif defined(ARDUINO_ARCH_AVR)
 #if defined(__avr_atmega1280__) || defined(__avr_atmega1284__) || defined(__avr_atmega2560__)
@@ -345,7 +352,7 @@ MY_DEFAULT_RX_LED_PIN in your sketch instead to enable LEDs
 
 // POWER PIN
 #ifndef DOXYGEN
-#if defined(MY_RF24_POWER_PIN) || defined(MY_RFM69_POWER_PIN) || defined(MY_RFM95_POWER_PIN) || defined(MY_RADIO_NRF5_ESB)
+#if defined(MY_RF24_POWER_PIN) || defined(MY_RFM69_POWER_PIN) || defined(MY_RFM95_POWER_PIN) || defined(MY_RADIO_NRF5_ESB) || defined(MY_RADIO_SX126x_POWER_PIN)
 #define RADIO_CAN_POWER_OFF (true)
 #else
 #define RADIO_CAN_POWER_OFF (false)
@@ -381,6 +388,9 @@ MY_DEFAULT_RX_LED_PIN in your sketch instead to enable LEDs
 #elif defined(MY_RADIO_RFM95)
 #include "hal/transport/RFM95/driver/RFM95.cpp"
 #include "hal/transport/RFM95/MyTransportRFM95.cpp"
+#elif defined(MY_RADIO_SX126x)
+#include "hal/transport/SX126x/driver/SX126x.cpp"
+#include "hal/transport/SX126x/MyTransportSX126x.cpp"
 #endif
 
 #if (defined(MY_RF24_ENABLE_ENCRYPTION) && defined(MY_RADIO_RF24)) || (defined(MY_NRF5_ESB_ENABLE_ENCRYPTION) && defined(MY_RADIO_NRF5_ESB)) || (defined(MY_RFM69_ENABLE_ENCRYPTION) && defined(MY_RADIO_RFM69)) || (defined(MY_RFM95_ENABLE_ENCRYPTION) && defined(MY_RADIO_RFM95))
@@ -446,8 +456,11 @@ MY_DEFAULT_RX_LED_PIN in your sketch instead to enable LEDs
 #include "hal/architecture/Linux/MyMainLinuxGeneric.cpp"
 #elif defined(ARDUINO_ARCH_STM32F1)
 #include "hal/architecture/STM32F1/MyMainSTM32F1.cpp"
+#elif defined(__ASR6501__) || defined(__ASR6502__) 
+#include "hal/architecture/ASR650x/MyMainASR650x.cpp"
 #elif defined(__arm__) && defined(TEENSYDUINO)
 #include "hal/architecture/Teensy3/MyMainTeensy3.cpp"
+
 #endif
 
 #endif

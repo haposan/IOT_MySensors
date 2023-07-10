@@ -152,6 +152,7 @@
  * | AVR          | A
  * | STM32F1      | M
  * | TEENSY       | T
+ * | CUBECELL     | C 
  * | Linux        | L
  * | Unknown      | -
  */
@@ -169,6 +170,8 @@
 #define MY_CAP_ARCH "M"
 #elif defined(__arm__) && defined(TEENSYDUINO)
 #define MY_CAP_ARCH "T"
+#elif defined(ARDUINO_ARCH_CUBECELL)
+#define MY_CAP_ARCH "C"
 #elif defined(__linux__)
 #define MY_CAP_ARCH "L"
 #else
